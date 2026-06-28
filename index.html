@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MQTT Chat — voice &amp; text</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>📡 MQTT Chat</h1>
+    <div class="status"><span id="dot" class="dot"></span><span id="statusText">Disconnected</span></div>
+    <div class="setup">
+      <input id="nick" placeholder="Your name" maxlength="24" style="width:120px" />
+      <input id="room" placeholder="Room name" value="lobby" maxlength="40" style="width:120px" />
+      <button id="connectBtn">Connect</button>
+    </div>
+  </header>
+
+  <div class="hint">
+    Broker: <b>broker.hivemq.com</b> (public &amp; free). Everyone in the same room can read messages — it's a public broker, so don't send secrets.
+  </div>
+
+  <div id="messages"></div>
+
+  <footer>
+    <input id="text" placeholder="Type a message… (Enter to send)" disabled />
+    <button id="sendBtn" disabled>Send</button>
+    <button id="voiceBtn" class="ghost" disabled title="Click to start/stop recording">🎤 Voice</button>
+    <span id="recbar" class="recbar">● Recording <span id="recTime">0s</span></span>
+  </footer>
+
+  <!-- MQTT over WebSockets client -->
+  <script src="https://unpkg.com/mqtt@5/dist/mqtt.min.js"></script>
+
+  <!-- App modules (load order matters) -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/mqtt-client.js"></script>
+  <script src="assets/js/voice.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
