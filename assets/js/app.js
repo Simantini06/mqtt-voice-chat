@@ -26,6 +26,7 @@ window.Chat = window.Chat || {};
   ui.el.callBtn.onclick = Chat.call.toggle;
   ui.el.muteBtn.onclick = Chat.call.toggleMute;
   ui.el.leaveCallBtn.onclick = () => Chat.call.leaveCall(false);
+  ui.el.soundBtn.onclick = Chat.call.unlockAudio;
 
   window.addEventListener("beforeunload", () => {
     if (Chat.state.client) {

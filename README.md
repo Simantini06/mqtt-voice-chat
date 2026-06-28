@@ -99,6 +99,12 @@ every other), so it's best for small groups (~2–5 people).
    `config.js`). Use **🎙️ Mute** to toggle your mic and **Leave call** to drop
    out.
 
+> 🔇 **Can't hear anyone?** Browsers block audio that starts outside a tap/click.
+> If a stream arrives after your Join click "expires", an orange **🔊 Enable
+> sound** button appears in the call bar — tap it once to unlock playback.
+> Testing with two tabs on one computer causes echo/feedback; use two separate
+> devices or headphones.
+
 ## ⚙️ Configuration
 
 Edit `assets/js/config.js`:

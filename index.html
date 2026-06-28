@@ -8,11 +8,13 @@
 </head>
 <body>
   <header>
-    <h1>📡 MQTT Chat</h1>
-    <div class="status"><span id="dot" class="dot"></span><span id="statusText">Disconnected</span></div>
+    <div class="titlebar">
+      <h1>📡 MQTT Chat</h1>
+      <div class="status"><span id="dot" class="dot"></span><span id="statusText">Disconnected</span></div>
+    </div>
     <div class="setup">
-      <input id="nick" placeholder="Your name" maxlength="24" style="width:120px" />
-      <input id="room" placeholder="Room name" value="lobby" maxlength="40" style="width:120px" />
+      <input id="nick" class="field" placeholder="Your name" maxlength="24" />
+      <input id="room" class="field" placeholder="Room name" value="lobby" maxlength="40" />
       <button id="connectBtn">Connect</button>
     </div>
   </header>
@@ -25,6 +27,7 @@
   <div id="callBar" class="callbar">
     <span id="callInfo">🔊 In call</span>
     <span id="callPeers" class="peers"></span>
+    <button id="soundBtn" class="warn small" style="display:none">🔊 Enable sound</button>
     <button id="muteBtn" class="ghost small">🎙️ Mute</button>
     <button id="leaveCallBtn" class="danger small">Leave call</button>
   </div>

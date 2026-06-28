@@ -21,6 +21,7 @@ window.Chat = window.Chat || {};
     callBar: $("callBar"),
     callInfo: $("callInfo"),
     callPeers: $("callPeers"),
+    soundBtn: $("soundBtn"),
     muteBtn: $("muteBtn"),
     leaveCallBtn: $("leaveCallBtn"),
     audioSink: $("audioSink"),
@@ -113,8 +114,12 @@ window.Chat = window.Chat || {};
     el.muteBtn.classList.toggle("ghost", !muted);
   }
 
+  function showEnableSound(show) {
+    el.soundBtn.style.display = show ? "inline-block" : "none";
+  }
+
   Chat.ui = {
     el, setStatus, sys, scroll, timeStr, bubble, renderText, renderVoice, enableChat,
-    setCallBar, setMuted,
+    setCallBar, setMuted, showEnableSound,
   };
 })();

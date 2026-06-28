@@ -55,6 +55,7 @@ window.Chat = window.Chat || {};
       localStream = null;
     }
     refreshBar();
+    ui.showEnableSound(false);
     if (!silent) ui.sys("You left the voice call.");
   }
 
@@ -124,14 +125,21 @@ window.Chat = window.Chat || {};
     };
 
     pc.ontrack = (e) => {
+      const stream = e.streams[0];
       if (!peer.audioEl) {
         const audio = document.createElement("audio");
         audio.autoplay = true;
-        audio.srcObject = e.streams[0];
+        audio.playsInline = true;
+        audio.setAttribute("playsinline", ""); // iOS Safari needs the attribute
+        audio.srcObject = stream;
         ui.el.audioSink.appendChild(audio);
         peer.audioEl = audio;
         ui.sys((peer.nick || "Someone") + " connected to the call.");
         refreshBar();
+        playAudio(audio);
+      } else {
+        peer.audioEl.srcObject = stream;
+        playAudio(peer.audioEl);
       }
     };
 
@@ -209,6 +217,23 @@ window.Chat = window.Chat || {};
 
   // --- UI ------------------------------------------------------------------
 
+  // Browsers block autoplay of audio that starts outside a user gesture (the
+  // remote track arrives seconds after the Join click). Try to play; if blocked,
+  // surface an "Enable sound" button the user can tap to unlock playback.
+  function playAudio(el) {
+    const p = el.play();
+    if (p && typeof p.catch === "function") {
+      p.catch(() => ui.showEnableSound(true));
+    }
+  }
+
+  // Called from a user tap — plays every remote stream and hides the prompt.
+  function unlockAudio() {
+    ui.showEnableSound(false);
+    const audios = ui.el.audioSink.querySelectorAll("audio");
+    Array.prototype.forEach.call(audios, (el) => { el.play().catch(() => {}); });
+  }
+
   function refreshBar() {
     const names = Object.keys(peers)
       .filter((id) => peers[id].audioEl) // only show fully-connected peers
@@ -216,5 +241,5 @@ window.Chat = window.Chat || {};
     ui.setCallBar(inCall, names);
   }
 
-  Chat.call = { toggle, joinCall, leaveCall, toggleMute, onSignal };
+  Chat.call = { toggle, joinCall, leaveCall, toggleMute, onSignal, unlockAudio };
 })();
