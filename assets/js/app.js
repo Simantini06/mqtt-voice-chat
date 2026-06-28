@@ -22,8 +22,14 @@ window.Chat = window.Chat || {};
   ui.el.text.addEventListener("keydown", (e) => { if (e.key === "Enter") sendText(); });
   ui.el.voiceBtn.onclick = voice.toggle;
 
+  // Group voice call controls
+  ui.el.callBtn.onclick = Chat.call.toggle;
+  ui.el.muteBtn.onclick = Chat.call.toggleMute;
+  ui.el.leaveCallBtn.onclick = () => Chat.call.leaveCall(false);
+
   window.addEventListener("beforeunload", () => {
     if (Chat.state.client) {
+      try { Chat.call.leaveCall(false); } catch (e) {}
       try { mqtt.publish({ type: "leave" }); } catch (e) {}
     }
   });

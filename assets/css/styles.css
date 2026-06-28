@@ -104,3 +104,28 @@ footer {
 
 .hint { font-size: 11px; color: var(--muted); padding: 4px 16px; background: var(--panel); }
 .recbar { font-size: 12px; color: var(--danger); display: none; align-items: center; gap: 6px; }
+
+button.small { padding: 5px 10px; font-size: 12px; }
+button.active { background: var(--accent2); }
+
+.callbar {
+  display: none;            /* shown (as flex) only while in a call */
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+  background: #14241c;
+  border-bottom: 1px solid #000;
+  font-size: 13px;
+}
+.callbar #callInfo { font-weight: 600; color: var(--accent2); }
+.callbar .peers { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+.callbar .peer-chip {
+  font-size: 12px;
+  background: var(--panel2);
+  border: 1px solid #2c3142;
+  border-radius: 999px;
+  padding: 2px 10px;
+  color: var(--text);
+}
+.callbar .peer-chip::before { content: "🟢 "; font-size: 10px; }

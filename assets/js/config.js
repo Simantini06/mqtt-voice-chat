@@ -14,4 +14,12 @@ Chat.config = {
 
   // Hard cap on a single voice recording.
   MAX_VOICE_SECONDS: 60,
+
+  // STUN servers for WebRTC NAT traversal (used by the group voice call mesh).
+  // These are public Google STUN servers — no backend of ours involved.
+  // Note: peers behind symmetric NATs may need a TURN server (not included).
+  ICE_SERVERS: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+  ],
 };

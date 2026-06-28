@@ -9,6 +9,8 @@ in the same room subscribes to the same topic.
 
 - 💬 Real-time **text** chat
 - 🎤 **Voice** messages (recorded with the browser `MediaRecorder` API)
+- 📞 **Group voice calls** — live, low-latency, peer-to-peer via WebRTC, with
+  MQTT as the signaling channel (mute toggle + live participant list)
 - 🧩 Large voice clips are **chunked** so they fit the broker's packet limits, then
   reassembled on the receiving side
 - 🟢 Live connection status + join/leave notices
@@ -50,6 +52,7 @@ mqtt-voice-chat/
 │       ├── ui.js           # DOM refs + message rendering
 │       ├── mqtt-client.js  # connect / publish / route messages
 │       ├── voice.js        # record, chunk-send, reassemble
+│       ├── call.js         # group voice call (WebRTC mesh over MQTT)
 │       └── app.js          # entry point + event wiring
 ├── README.md
 └── LICENSE
@@ -62,16 +65,39 @@ agree on a small JSON protocol published to the topic `mqttchat/<room>`:
 
 | `type`        | Payload                                  | Meaning                       |
 | ------------- | ---------------------------------------- | ----------------------------- |
-| `text`        | `{ text }`                               | a chat message                |
-| `join`        | —                                        | someone joined the room       |
-| `leave`       | —                                        | someone left the room         |
-| `voice-chunk` | `{ id, i, n, mime, data }`               | one base64 slice of audio     |
+| `text`         | `{ text }`                              | a chat message                |
+| `join`         | —                                       | someone joined the room       |
+| `leave`        | —                                       | someone left the room         |
+| `voice-chunk`  | `{ id, i, n, mime, data }`              | one base64 slice of audio     |
+| `call-join`    | —                                       | I joined the voice call       |
+| `call-present` | `{ to }`                                | "I'm already in the call"     |
+| `call-leave`   | —                                       | I left the voice call         |
+| `offer`        | `{ to, sdp }`                           | WebRTC offer                  |
+| `answer`       | `{ to, sdp }`                           | WebRTC answer                 |
+| `ice`          | `{ to, candidate }`                     | WebRTC ICE candidate          |
 
 Every envelope also carries `from` (unique client id), `nick`, and `ts`.
 
-Voice flow: record → `Blob` → base64 → split into `CHUNK_SIZE` pieces → publish
-each as a `voice-chunk` → receiver buffers by `id` until all `n` parts arrive →
-decode and play.
+Voice **message** flow: record → `Blob` → base64 → split into `CHUNK_SIZE` pieces
+→ publish each as a `voice-chunk` → receiver buffers by `id` until all `n` parts
+arrive → decode and play.
+
+### Group voice call
+
+The **call** is real WebRTC: only the signaling travels over MQTT, while the
+audio streams peer-to-peer. It forms a **mesh** (every participant connects to
+every other), so it's best for small groups (~2–5 people).
+
+1. Click **📞 Join call**. The browser asks for mic permission and broadcasts
+   `call-join`.
+2. Everyone already in the call replies `call-present`, so both sides discover
+   each other.
+3. For each pair, the peer with the **smaller client id** sends the `offer`; the
+   other replies with an `answer`. `ice` candidates are exchanged as they're
+   found. This deterministic rule prevents duplicate/colliding offers ("glare").
+4. Audio then flows directly between browsers (via the public STUN servers in
+   `config.js`). Use **🎙️ Mute** to toggle your mic and **Leave call** to drop
+   out.
 
 ## ⚙️ Configuration
 
@@ -92,6 +118,12 @@ Edit `assets/js/config.js`:
   (username/password + TLS) and update `BROKER_URL` / connect options.
 - **No history** — MQTT is not a database. You only see messages received while
   connected.
+- **Call group size** — the call is a full mesh, so each participant uploads
+  their mic to every other. It works great for a handful of people; it won't
+  scale to large rooms (that needs an SFU media server, which would break the
+  no-backend design).
+- **NAT traversal** — uses free public STUN only. Most networks work, but peers
+  behind strict/symmetric NATs may fail to connect without a TURN server.
 
 ## 📄 License
 

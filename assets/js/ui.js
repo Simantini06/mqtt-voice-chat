@@ -17,6 +17,13 @@ window.Chat = window.Chat || {};
     voiceBtn: $("voiceBtn"),
     recbar: $("recbar"),
     recTime: $("recTime"),
+    callBtn: $("callBtn"),
+    callBar: $("callBar"),
+    callInfo: $("callInfo"),
+    callPeers: $("callPeers"),
+    muteBtn: $("muteBtn"),
+    leaveCallBtn: $("leaveCallBtn"),
+    audioSink: $("audioSink"),
   };
 
   function setStatus(state, text) {
@@ -79,8 +86,35 @@ window.Chat = window.Chat || {};
   }
 
   function enableChat(on) {
-    el.text.disabled = el.sendBtn.disabled = el.voiceBtn.disabled = !on;
+    el.text.disabled = el.sendBtn.disabled = el.voiceBtn.disabled = el.callBtn.disabled = !on;
   }
 
-  Chat.ui = { el, setStatus, sys, scroll, timeStr, bubble, renderText, renderVoice, enableChat };
+  // Show/refresh the call bar. `peerNames` is an array of connected participant labels.
+  function setCallBar(inCall, peerNames) {
+    el.callBar.style.display = inCall ? "flex" : "none";
+    el.callBtn.textContent = inCall ? "📞 In call" : "📞 Join call";
+    el.callBtn.classList.toggle("active", inCall);
+    if (inCall) {
+      const n = peerNames.length;
+      el.callInfo.textContent = n ? "🔊 In call — you + " + n + " other" + (n > 1 ? "s" : "") : "🔊 In call — waiting for others…";
+      el.callPeers.innerHTML = "";
+      peerNames.forEach((name) => {
+        const chip = document.createElement("span");
+        chip.className = "peer-chip";
+        chip.textContent = name;
+        el.callPeers.appendChild(chip);
+      });
+    }
+  }
+
+  function setMuted(muted) {
+    el.muteBtn.textContent = muted ? "🔇 Unmute" : "🎙️ Mute";
+    el.muteBtn.classList.toggle("danger", muted);
+    el.muteBtn.classList.toggle("ghost", !muted);
+  }
+
+  Chat.ui = {
+    el, setStatus, sys, scroll, timeStr, bubble, renderText, renderVoice, enableChat,
+    setCallBar, setMuted,
+  };
 })();

@@ -50,6 +50,7 @@ window.Chat = window.Chat || {};
   }
 
   function disconnect() {
+    if (Chat.call) Chat.call.leaveCall(true); // tear down any active voice call first
     if (S.client) {
       try { publish({ type: "leave" }); } catch (e) {}
       S.client.end(true);
@@ -78,6 +79,14 @@ window.Chat = window.Chat || {};
         break;
       case "voice-chunk":
         Chat.voice.handleChunk(m);
+        break;
+      case "call-join":
+      case "call-present":
+      case "call-leave":
+      case "offer":
+      case "answer":
+      case "ice":
+        Chat.call.onSignal(m);
         break;
     }
   }

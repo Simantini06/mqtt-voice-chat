@@ -21,14 +21,26 @@
     Broker: <b>broker.hivemq.com</b> (public &amp; free). Everyone in the same room can read messages — it's a public broker, so don't send secrets.
   </div>
 
+  <!-- Group voice call status bar (hidden until you join a call) -->
+  <div id="callBar" class="callbar">
+    <span id="callInfo">🔊 In call</span>
+    <span id="callPeers" class="peers"></span>
+    <button id="muteBtn" class="ghost small">🎙️ Mute</button>
+    <button id="leaveCallBtn" class="danger small">Leave call</button>
+  </div>
+
   <div id="messages"></div>
 
   <footer>
     <input id="text" placeholder="Type a message… (Enter to send)" disabled />
     <button id="sendBtn" disabled>Send</button>
     <button id="voiceBtn" class="ghost" disabled title="Click to start/stop recording">🎤 Voice</button>
+    <button id="callBtn" class="ghost" disabled title="Join the group voice call">📞 Join call</button>
     <span id="recbar" class="recbar">● Recording <span id="recTime">0s</span></span>
   </footer>
+
+  <!-- Remote call audio streams are attached here (not visible) -->
+  <div id="audioSink" style="display:none"></div>
 
   <!-- MQTT over WebSockets client -->
   <script src="https://unpkg.com/mqtt@5/dist/mqtt.min.js"></script>
@@ -39,6 +51,7 @@
   <script src="assets/js/ui.js"></script>
   <script src="assets/js/mqtt-client.js"></script>
   <script src="assets/js/voice.js"></script>
+  <script src="assets/js/call.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
 </html>
