@@ -28,6 +28,11 @@ window.Chat = window.Chat || {};
   ui.el.leaveCallBtn.onclick = () => Chat.call.leaveCall(false);
   ui.el.soundBtn.onclick = Chat.call.unlockAudio;
 
+  // Debug log controls
+  ui.el.logBtn.onclick = Chat.debug.toggle;
+  ui.el.clearLogBtn.onclick = Chat.debug.clear;
+  ui.el.closeLogBtn.onclick = () => Chat.debug.show(false);
+
   window.addEventListener("beforeunload", () => {
     if (Chat.state.client) {
       try { Chat.call.leaveCall(false); } catch (e) {}

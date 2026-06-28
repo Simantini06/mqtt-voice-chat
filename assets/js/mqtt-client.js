@@ -30,10 +30,12 @@ window.Chat = window.Chat || {};
       connectTimeout: 8000,
     });
 
+    Chat.debug.log("Connecting to broker " + C.BROKER_URL, "info");
     S.client.on("connect", () => {
       ui.setStatus("on", "Connected · room: " + S.room);
+      Chat.debug.log("Broker connected · subscribing to " + S.topic, "ok");
       S.client.subscribe(S.topic, { qos: 0 }, (err) => {
-        if (err) ui.sys("Subscribe error: " + err.message);
+        if (err) { ui.sys("Subscribe error: " + err.message); Chat.debug.log("Subscribe error: " + err.message, "err"); }
       });
       ui.enableChat(true);
       ui.el.connectBtn.textContent = "Disconnect";

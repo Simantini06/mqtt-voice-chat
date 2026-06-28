@@ -25,6 +25,10 @@ window.Chat = window.Chat || {};
     muteBtn: $("muteBtn"),
     leaveCallBtn: $("leaveCallBtn"),
     audioSink: $("audioSink"),
+    waveforms: $("waveforms"),
+    logBtn: $("logBtn"),
+    clearLogBtn: $("clearLogBtn"),
+    closeLogBtn: $("closeLogBtn"),
   };
 
   function setStatus(state, text) {
@@ -93,6 +97,7 @@ window.Chat = window.Chat || {};
   // Show/refresh the call bar. `peerNames` is an array of connected participant labels.
   function setCallBar(inCall, peerNames) {
     el.callBar.style.display = inCall ? "flex" : "none";
+    el.waveforms.style.display = inCall ? "flex" : "none";
     el.callBtn.textContent = inCall ? "📞 In call" : "📞 Join call";
     el.callBtn.classList.toggle("active", inCall);
     if (inCall) {

@@ -11,6 +11,7 @@
     <div class="titlebar">
       <h1>📡 MQTT Chat</h1>
       <div class="status"><span id="dot" class="dot"></span><span id="statusText">Disconnected</span></div>
+      <button id="logBtn" class="ghost small" title="Show/hide debug log">🐞 Logs</button>
     </div>
     <div class="setup">
       <input id="nick" class="field" placeholder="Your name" maxlength="24" />
@@ -32,6 +33,9 @@
     <button id="leaveCallBtn" class="danger small">Leave call</button>
   </div>
 
+  <!-- Live audio waveforms (mic + each peer), visible during a call -->
+  <div id="waveforms" class="waveforms"></div>
+
   <div id="messages"></div>
 
   <footer>
@@ -45,6 +49,18 @@
   <!-- Remote call audio streams are attached here (not visible) -->
   <div id="audioSink" style="display:none"></div>
 
+  <!-- Debug log drawer -->
+  <div id="debugPanel" class="debug">
+    <div class="debug-head">
+      <span>🐞 Debug log</span>
+      <span class="debug-actions">
+        <button id="clearLogBtn" class="ghost small">Clear</button>
+        <button id="closeLogBtn" class="ghost small">Hide</button>
+      </span>
+    </div>
+    <div id="debugLog" class="debug-log"></div>
+  </div>
+
   <!-- MQTT over WebSockets client -->
   <script src="https://unpkg.com/mqtt@5/dist/mqtt.min.js"></script>
 
@@ -52,6 +68,8 @@
   <script src="assets/js/config.js"></script>
   <script src="assets/js/state.js"></script>
   <script src="assets/js/ui.js"></script>
+  <script src="assets/js/debug.js"></script>
+  <script src="assets/js/viz.js"></script>
   <script src="assets/js/mqtt-client.js"></script>
   <script src="assets/js/voice.js"></script>
   <script src="assets/js/call.js"></script>
