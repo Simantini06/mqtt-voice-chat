@@ -123,6 +123,7 @@ button.active { background: var(--accent2); }
   font-size: 13px;
 }
 .callbar #callInfo { font-weight: 600; color: var(--accent2); }
+#soundBtn { animation: pulse 1.1s infinite; } /* draw the eye when sound is blocked */
 .callbar .peers { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
 .callbar .peer-chip {
   font-size: 12px;

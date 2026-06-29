@@ -21,6 +21,7 @@ window.Chat = window.Chat || {};
   let inCall = false;
   let localStream = null;
   let muted = false;
+  let unlockInstalled = false; // global "tap anywhere to enable sound" guard
   const peers = {}; // peerId -> { pc, audioEl, nick, pending: [candidates] }
 
   // --- Public API ----------------------------------------------------------
@@ -49,8 +50,10 @@ window.Chat = window.Chat || {};
         (tracks[0] ? " [" + (tracks[0].label || "default") + "]" : ""), "ok");
     Chat.viz.ensureCtx();
     Chat.viz.attach("self", S.nick || "You", localStream, true);
+    installUnlock(); // first tap anywhere will unlock speaker output (mobile-safe)
     refreshBar();
     ui.sys("You joined the voice call.");
+    ui.sys("🔊 If you can't hear anyone, tap the screen once or the 'Enable sound' button.");
     // Announce ourselves; existing members will respond with call-present.
     dbg("→ broadcast call-join as " + short(S.clientId), "info");
     Chat.mqtt.publish({ type: "call-join" });
@@ -293,20 +296,62 @@ window.Chat = window.Chat || {};
   // --- UI ------------------------------------------------------------------
 
   // Browsers block autoplay of audio that starts outside a user gesture (the
-  // remote track arrives seconds after the Join click). Try to play; if blocked,
-  // surface an "Enable sound" button the user can tap to unlock playback.
+  // remote track arrives seconds after the Join click — especially on mobile).
+  // Try to play; if blocked, surface the "Enable sound" button AND arm a global
+  // "tap anywhere" unlock so the very next touch turns the speaker on.
   function playAudio(el) {
+    el.muted = false;
+    el.volume = 1;
     const p = el.play();
     if (p && typeof p.catch === "function") {
-      p.catch(() => ui.showEnableSound(true));
+      p.then(() => dbg("▶ remote audio playing", "ok"))
+       .catch((err) => {
+         dbg("Autoplay blocked (" + (err && err.name) + ") — tap to enable sound", "warn");
+         ui.showEnableSound(true);
+         installUnlock();
+       });
     }
   }
 
-  // Called from a user tap — plays every remote stream and hides the prompt.
-  function unlockAudio() {
-    ui.showEnableSound(false);
+  // Try to (re)play every remote audio element. Returns true if none were blocked.
+  function playAll() {
+    try { Chat.viz.ensureCtx(); } catch (e) {}
     const audios = ui.el.audioSink.querySelectorAll("audio");
-    Array.prototype.forEach.call(audios, (el) => { el.play().catch(() => {}); });
+    let blocked = 0, total = 0;
+    Array.prototype.forEach.call(audios, (el) => {
+      total++;
+      el.muted = false;
+      el.volume = 1;
+      const p = el.play();
+      if (p && typeof p.catch === "function") p.catch(() => { blocked++; });
+    });
+    return total > 0 && blocked === 0;
+  }
+
+  // Called from a user tap (the button or the global listener): unlock + play.
+  function unlockAudio() {
+    playAll();
+    ui.showEnableSound(false);
+    dbg("Sound enabled by user gesture", "ok");
+  }
+
+  // Arm a one-time, document-wide unlock. ANY tap/click on the page resumes the
+  // audio context and replays remote streams — the most forgiving mobile path.
+  function installUnlock() {
+    if (unlockInstalled) return;
+    unlockInstalled = true;
+    const handler = () => {
+      try { Chat.viz.ensureCtx(); } catch (e) {}
+      const ok = playAll();
+      if (ok) {
+        ui.showEnableSound(false);
+        document.removeEventListener("pointerdown", handler, true);
+        document.removeEventListener("touchend", handler, true);
+        unlockInstalled = false;
+      }
+    };
+    document.addEventListener("pointerdown", handler, true);
+    document.addEventListener("touchend", handler, true);
   }
 
   function refreshBar() {
